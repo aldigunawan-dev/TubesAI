@@ -73,7 +73,7 @@ def predict_classification(train, test_row, num_neighbors):
 	return prediction
  
 # Make a prediction with KNN on Iris Dataset
-filename = 'diabetes.csv'
+filename = 'winequality-red.csv'
 dataset = load_csv(filename)
 for i in range(len(dataset[0])-1):
 	str_column_to_float(dataset, i)
