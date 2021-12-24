@@ -33,7 +33,8 @@ def dataset_minmax(dataset):
 def normalisasi_dataset(dataset, minmax):
 	for row in dataset:
 		for i in range(len(row)):
-			row[i] = (row[i] - minmax[i][0]) / (minmax[i][1] - minmax[i][0])
+			row[i] = round((row[i] - minmax[i][0]) / (minmax[i][1] - minmax[i][0]), 2)
+	return dataset
 
 # Bagi dataset menjadi n bagian
 def bagi_data(dataset, n_folds):
@@ -60,6 +61,7 @@ def hitung_akurasi(actual, predicted):
 def evaluasi(dataset, algorithm, n_folds, *args):
 	folds = bagi_data(dataset, n_folds)
 	skor = list()
+	count = int(0)
 	for fold in folds:
 		train_set = list(folds)
 		train_set.remove(fold)
@@ -69,6 +71,8 @@ def evaluasi(dataset, algorithm, n_folds, *args):
 			row_copy = list(row)
 			test_set.append(row_copy)
 			row_copy[-1] = None
+		count += 1
+		print("Train dataset ke-{}".format(count))
 		predicted = algorithm(train_set, test_set, *args)
 		actual = [row[-1] for row in fold]
 		accuracy = hitung_akurasi(actual, predicted)
@@ -92,6 +96,9 @@ def cari_tetangga(train, test_row, num_neighbors):
 	neighbors = list()
 	for i in range(num_neighbors):
 		neighbors.append(distances[i][0])
+	print("Tetangga dari : {}".format(test_row))
+	for i in range (num_neighbors):
+		print("{} Jarak Euclidian: {} \n".format((neighbors[i]), (distances[i][1])))
 	return neighbors
 
 # Buat prediksi
@@ -113,10 +120,12 @@ def KNN(train, test, num_neighbors):
 seed(1)
 file = 'diabetes.csv'
 dataset = load_csv(file)
-for i in range(len(dataset[0])-1):
+for i in range(len(dataset[0])):
 	string_ke_float(dataset, i)
+minmax = dataset_minmax(dataset)
+dataset_normal = normalisasi_dataset(dataset,minmax)
 n_folds = 5
 num_neighbors = 21
-skor = evaluasi(dataset, KNN, n_folds, num_neighbors)
+skor = evaluasi(dataset_normal, KNN, n_folds, num_neighbors)
 print('Akurasi: %s' % skor)
 print('Rata-rata Akurasi: %.3f%%' % (sum(skor)/float(len(skor))))
